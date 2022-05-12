@@ -47,7 +47,7 @@ if bdebug:
         plt.title("Digit: {}".format(Y_train[i]))
         plt.xticks([])
         plt.yticks([])
-    plt.show(block=False)
+    plt.show()
 
 
 
