@@ -112,7 +112,7 @@ if bAutoFindWrong:
         val_pred = np.argmax(prediction);
         val_truth = Y_test[i];
         if val_pred != val_truth:
-            print("test[{0}] - {2}".format(i, '\033[91mWRONG\033[00m'))
+            print("test[{0}] - \033[91mWRONG\033[00m".format(i))
 
 
 # Manual test model
