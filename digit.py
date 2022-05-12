@@ -1,3 +1,6 @@
+bdebug = 0;
+bAutoFindWrong = 0;
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
@@ -21,9 +24,11 @@ X_test = test_data[:,1:]
 Y_test = test_data[:,0].astype(int)
 
 
+
 # Convert them into 16x16 image
 x_train = X_train.reshape(7291, 16, 16, 1).astype('float32')
 x_test = X_test.reshape(2007, 16, 16, 1).astype('float32')
+
 
 
 # Classification
@@ -33,15 +38,16 @@ y_test_class = tf.keras.utils.to_categorical(Y_test, n_classes)
 
 
 # Show training data image
-# plt.figure()
-# for i in range(36):
-    # plt.subplot(6,6,i+1)
-    # plt.tight_layout()
-    # plt.imshow(x_train[i], cmap='gray', interpolation='none')
-    # plt.title("Digit: {}".format(Y_train[i]))
-    # plt.xticks([])
-    # plt.yticks([])
-# plt.show()
+if bdebug:
+    plt.figure()
+    for i in range(36):
+        plt.subplot(6,6,i+1)
+        plt.tight_layout()
+        plt.imshow(x_train[i], cmap='gray', interpolation='none')
+        plt.title("Digit: {}".format(Y_train[i]))
+        plt.xticks([])
+        plt.yticks([])
+    plt.show(block=False)
 
 
 
@@ -62,26 +68,70 @@ model.add(tf.keras.layers.Dense(10, activation="softmax"))
 model.summary()
 
 model.compile(optimizer='RMSprop', loss='categorical_crossentropy', metrics=['accuracy'])
+nBatchSize = tk.simpledialog.askinteger("Input", "Batch size\nMax: {0}".format(len(x_train)))
 epochvalue = tk.simpledialog.askinteger("Input", "Enter total epoches for training")
-model.fit(x_train, y_train_class, epochs=epochvalue)
+epoch_model = model.fit(x_train, y_train_class, epochs=epochvalue, batch_size=nBatchSize, validation_data=(x_test, y_test_class))
+
+
+
+# Epoch plotting
+if bdebug:
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.plot(epoch_model.history['accuracy'])
+    plt.plot(epoch_model.history['val_accuracy'])
+    plt.title('Model Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'test'], loc='lower right')
+
+    plt.subplot(2,1,2)
+    plt.plot(epoch_model.history['loss'])
+    plt.plot(epoch_model.history['val_loss'])
+    plt.title('Model Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'test'], loc='upper right')
+
+    plt.tight_layout()
+    plt.show(block=False)
+
 
 
 # Test model eval
 print("\n\nTest model evaluation:");
 results = model.evaluate(x_test, y_test_class)
-print("Test loss: {0}\nTest accuracy: {1}\n\n".format(results[0], results[1]))
+print("Test score: {0}\nTest accuracy: {1}\nTest loss: {2}\n\n".format(results[0], results[1], 1.0 - results[1]))
+
+
+
+# Automatic find all the wrong
+if bAutoFindWrong:
+    for i in range(len(x_test)):
+        prediction = model.predict(x_test[i].reshape(1, 16, 16))
+        val_pred = np.argmax(prediction);
+        val_truth = Y_test[i];
+        if val_pred != val_truth:
+            print("test[{0}] - {2}".format(i, '\033[91mWRONG\033[00m'))
 
 
 # Manual test model
 while 1:
     testmodel_index = tk.simpledialog.askinteger("Input", "Input the index # of the test model\nMax: {0}".format(len(x_test)))
     prediction = model.predict(x_test[testmodel_index].reshape(1, 16, 16))
+    val_pred = np.argmax(prediction);
+    val_truth = Y_test[testmodel_index];
+    if val_pred == val_truth:
+        output_test = '\033[92mCORRECT\033[00m'
+    else:
+        output_test = '\033[91mWRONG\033[00m'
+    
     plt.figure()
-    plt.title("Predicted: {0}\nTruth: {1}".format(np.argmax(prediction), Y_test[testmodel_index]))
+    plt.title("Predicted: {0}\nTruth: {1}".format(val_pred, val_truth))
     plt.imshow(x_test[testmodel_index], cmap='gray', interpolation='none')
     plt.xticks([])
     plt.yticks([])
-    print("test[{0}] - Predicted: {1}, Truth: {2}".format(testmodel_index, np.argmax(prediction), Y_test[testmodel_index]))
+    print("test[{0}] - Predicted: {1}, Truth: {2} {3}".format(testmodel_index, val_pred, val_truth, output_test))
     plt.show()
 
 
