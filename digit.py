@@ -101,18 +101,21 @@ if bdebug:
 # Test model eval
 print("\n\nTest model evaluation:");
 results = model.evaluate(x_test, y_test_class)
-print("Test score: {0}\nTest accuracy: {1}\nTest loss: {2}\n\n".format(results[0], results[1], 1.0 - results[1]))
+print("Test loss: {0}\nTest accuracy: {1}\nTest wrong: {2}\n\n".format(results[0], results[1], 1.0 - results[1]))
 
 
 
 # Automatic find all the wrong
 if bAutoFindWrong:
+    total_wrong = 0
     for i in range(len(x_test)):
         prediction = model.predict(x_test[i].reshape(1, 16, 16))
         val_pred = np.argmax(prediction);
         val_truth = Y_test[i];
         if val_pred != val_truth:
             print("test[{0}] - \033[91mWRONG\033[00m".format(i))
+            total_wrong += 1
+    print("\nTotal Wrong: {0} out of {1}\n\n".format(total_wrong, len(x_test)))
 
 
 # Manual test model
