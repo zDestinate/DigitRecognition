@@ -1,5 +1,6 @@
-bdebug = 0;
-bAutoFindWrong = 0;
+bdebug = 0
+bAutoFindWrong = 0
+bModifiedArchitecture = 1
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
@@ -53,18 +54,29 @@ if bdebug:
 
 # Architecture
 model = tf.keras.models.Sequential()
-model.add(tf.keras.layers.Conv2D(32, (3, 3), input_shape=(16, 16, 1), padding="same", activation="relu"))
-model.add(tf.keras.layers.MaxPooling2D((2, 2)))
-model.add(tf.keras.layers.Dropout(0.05))
-model.add(tf.keras.layers.Conv2D(64, (3, 3), activation="relu"))
-model.add(tf.keras.layers.MaxPooling2D((2, 2)))
-model.add(tf.keras.layers.Dropout(0.05))
-model.add(tf.keras.layers.Flatten())
-model.add(tf.keras.layers.Dense(256, activation="relu"))
-model.add(tf.keras.layers.Dense(128, activation="relu"))
-model.add(tf.keras.layers.Dense(64, activation="relu"))
-model.add(tf.keras.layers.Dense(32, activation="relu"))
-model.add(tf.keras.layers.Dense(10, activation="softmax"))
+if bModifiedArchitecture:
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), input_shape=(16, 16, 1), padding="same", activation="relu"))
+    model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Dropout(0.05))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation="relu"))
+    model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Dropout(0.05))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(256, activation="relu"))
+    model.add(tf.keras.layers.Dense(128, activation="relu"))
+    model.add(tf.keras.layers.Dense(64, activation="relu"))
+    model.add(tf.keras.layers.Dense(32, activation="relu"))
+    model.add(tf.keras.layers.Dense(10, activation="softmax"))
+else:
+    model.add(tf.keras.layers.Conv2D(6, input_shape=(16, 16, 1), kernel_size=(3, 3), activation="relu"))
+    model.add(tf.keras.layers.AveragePooling2D(2, 2))
+    model.add(tf.keras.layers.Conv2D(16, kernel_size=(3, 3), activation="relu"))
+    model.add(tf.keras.layers.AveragePooling2D(2, 2))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(120, activation="relu"))
+    model.add(tf.keras.layers.Dense(84, activation="relu"))
+    model.add(tf.keras.layers.Dense(10, activation="softmax"))
+
 model.summary()
 
 model.compile(optimizer='RMSprop', loss='categorical_crossentropy', metrics=['accuracy'])
