@@ -9,6 +9,7 @@ py -m pip install matplotlib
 py -m pip install tensorflow
 py -m pip install opencv-python
 py -m pip install numpy
+py -m pip install tkinter
 ```
 
 
