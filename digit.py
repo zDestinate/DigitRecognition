@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 import tkinter.simpledialog
 import tkinter.filedialog
+tk.Tk().withdraw()
 
 
 # Load data from file
@@ -151,7 +152,6 @@ while 1:
 
 
 # Test file
-# tk.Tk().withdraw()
 # while 1:
     # filename = tk.filedialog.askopenfile()
     # if not filename:
